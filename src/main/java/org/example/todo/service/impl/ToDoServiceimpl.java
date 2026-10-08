@@ -1,15 +1,19 @@
 package org.example.todo.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.dto.AddToDoRequestDto;
-import org.example.todo.dto.AllMatching;
+import org.example.todo.dto.ToDoCreate;
 import org.example.todo.dto.ToDoDto;
 
 import org.example.todo.entity.ToDo;
+import org.example.todo.entity.ToUser;
 import org.example.todo.repository.ToDoRepository;
+import org.example.todo.repository.UserRepository;
 import org.example.todo.service.ToDoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +23,8 @@ public class ToDoServiceimpl implements ToDoService {
 
     private final ToDoRepository toDoRepository;
     private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
+
 
     @Override
     public ToDoDto createnewToDo(AddToDoRequestDto newtoDo) {
@@ -72,5 +78,28 @@ public class ToDoServiceimpl implements ToDoService {
     public List<ToDoDto> searchallByKeyword(String keyword) {
         List<ToDo> toDo = toDoRepository.searchallByKeyword(keyword);
         return toDo.stream().map( ToDo ->modelMapper.map(ToDo, ToDoDto.class)).toList();
+    }
+
+
+    @Transactional
+    public AddToDoRequestDto createNewUserToDo(ToDoCreate toDoCreate) {
+        Long userId = toDoCreate.getTouser_id();
+        System.out.println("Step 1  "+ userId);
+
+        ToUser user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user not found with Id" + userId));
+        System.out.println(user);
+        ToDo todo = ToDo.builder()
+                .title(toDoCreate.getTitle())
+                .description(toDoCreate.getDescription())
+                .build();
+
+        System.out.println(todo);
+
+        todo.setTouser(user);
+        user.getToDos().add(todo);
+
+        todo = toDoRepository.save(todo);
+        return modelMapper.map(todo,AddToDoRequestDto.class);
+
     }
 }

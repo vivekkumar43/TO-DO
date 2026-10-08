@@ -26,12 +26,14 @@ private final ToDoService toDoService;
 
     @GetMapping
     public List<ToDoDto> getToDo(){
+
         return toDoService.getAllToDo();
     }
 
 
     @GetMapping("/{id}")
     public ToDoDto getById(@PathVariable Long id){
+
         return toDoService.getByIdToDo(id);
     }
 

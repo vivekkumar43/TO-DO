@@ -1,4 +1,4 @@
-package org.example.todo.dto;
+package org.example.todo.dto.Userd;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,12 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ToDoDto {
+public class UserDto {
     private Long id;
-
-    private String title;
-    private String description;
-
-
-
+    private String name;
+    private String email;
+    private String password;
 }
